@@ -1,0 +1,63 @@
+.FormContainer{
+    position: absolute;
+    width: 80%;
+    height: 75%;
+    top: 20%;
+    left: 15%;
+    overflow-y: auto;
+    border: 2px solid rgb(216, 213, 213);
+}
+
+.FormContainer::-webkit-scrollbar {
+    display: none;
+  }
+
+.form-header{
+    display: flex;
+    justify-content:space-between;
+    align-items: center;
+    margin: auto;
+    width: 95%;
+    border-bottom: 3px solid rgb(114, 114, 114);
+}
+
+.header-end{
+    width: 20%;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+}
+
+.header-end div{
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+#save-btn,#cancel-btn{
+    position: absolute;
+    top:0;
+    right: 0;
+    margin-right: 20%;
+    margin-top: 1%;
+}
+
+#cancel-btn{
+    margin-right: 28%;
+}
+
+.form-body{
+    margin-top: 10px;
+    margin-left: 2%;
+    width: 90%;
+    height: 88%;
+}
+
+.contact-form{
+    width: 98%;
+    height: 45%;
+    margin: 1%;
+    margin-top:3%;
+    border: 1px solid rgb(216, 213, 213);
+}
+

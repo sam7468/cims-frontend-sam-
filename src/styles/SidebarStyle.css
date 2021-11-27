@@ -1,0 +1,13 @@
+
+.mui-sidebar-div{
+    position: absolute;
+    top: 15%;
+    left: 2%;
+    max-width: 300px;
+}
+
+
+.Listitem:hover{
+    color: rgb(44, 136, 217);
+    border-left: 3px rgb(44, 136, 217) solid ;
+}
