@@ -1,19 +1,30 @@
 import {useState} from "react";
 import axios from 'axios'
+import { useSelector,useDispatch } from "react-redux";
+import setCcode from "../actions/SetcCode";
+import setLoc from "../actions/SetLoc"
+
+// + should enabled after tertiary contact 
 
 
 // active client - dropdown
 // update only on onChange
 // phone no validation
 
-
-const initialFormValues = {
+const initialFormValues2 = {
     designation:"",
     brandname:"",
     clientname:"",
     domain:"",
     baselocation:"",
-    companyaddress:"",
+    addressLine1:"",
+    addressLine2:"",
+    pincode:"",
+    country:"",
+    state:"",
+    district:"",
+    city:"",
+    landmark:"",
     contacts:{
         primaryContact:{
             title:"",
@@ -42,6 +53,50 @@ const initialFormValues = {
     }
 }
 
+
+const initialFormValues = {
+    designation:"",
+    brandname:"",
+    clientname:"",
+    domain:"",
+    baselocation:"",
+    addressLine1:"",
+    addressLine2:"",
+    pincode:"",
+    country:"",
+    state:"",
+    district:"",
+    city:"",
+    landmark:"",
+    contacts:{
+        primaryContact:{
+            title:"",
+            firstName:"",
+            lastName:"",
+            email:"",
+            contactNumber:"",
+            otherContactNumber:"",
+        },
+        secondaryContact:{
+            title:"",
+            firstName:"",
+            lastName:"",
+            email:"",
+            contactNumber:"",
+            otherContactNumber:"",
+        },
+        tertiaryContact:{
+            title:"",
+            firstName:"",
+            lastName:"",
+            email:"",
+            contactNumber:"",
+            otherContactNumber:"",
+        }
+    }
+}
+
+
 const errorValues =  JSON.parse(JSON.stringify(initialFormValues));
 
 const contactSchema = {
@@ -59,6 +114,7 @@ const initialContacts = [
     {label: 'Tertiary Contact', title: 'tertiaryContact'}
 ]
 
+
 const fields = [
     {id: 'title', label: 'Title *'},
     {id: 'firstName', label: 'First name *'},
@@ -68,7 +124,25 @@ const fields = [
     {id: 'otherContactNumber', label: 'Other contact number *'}
 ]
 
+// new
+const addressFields = [
+    {name: 'addressLine1', label: 'Address Line 1 *'},
+    {name: 'addressLine2', label: 'Address Line 2'},
+    {name: 'country', label: 'Country *'},
+    {name: 'pincode', label: 'Postal/Pin Code *'},
+    {name: 'state', label: 'State *'},
+    {name: 'district', label: 'District *'},
+    {name: 'city', label: 'City *'},
+    {name: 'landmark', label: 'Landmark'}
+];
+
+
 export default function UseForm() {
+
+    const ccode = useSelector(state => state.getaddress);
+    const loc = useSelector(state => state.getaddress);
+    const dispatch = useDispatch();
+
 
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
@@ -132,10 +206,7 @@ export default function UseForm() {
         let temp = { ...errors }
         if (fieldValues.title || fieldValues.firstName || fieldValues.lastName ||
             fieldValues.email || fieldValues.contactNumber || fieldValues.otherContactNumber){
-                temp['contacts'][type].title = fieldValues.title ? "" : "This field is required."
-                temp['contacts'][type].firstName = fieldValues.firstName ? "" : "This field is required."
-                temp['contacts'][type].lastName = fieldValues.lastName ? "" : "This field is required."
-                temp['contacts'][type].email = fieldValues.email ? "" : "This field is required."
+            
                 if (fieldValues.email)
                     temp['contacts'][type].email = (/^[^@\s]+@[^@\s]+\.[^@\s]{2,4}$/).test(fieldValues.email)
                     ? ""
@@ -150,6 +221,8 @@ export default function UseForm() {
                     temp['contacts'][type].otherContactNumber = (/^[6-9][0-9]{9}$/).test(fieldValues.otherContactNumber)
                     ? ""
                     : "Other contact number is not valid."
+                else
+                    temp['contacts'][type].otherContactNumber = ''    
         }
         else{
             temp['contacts'][type].title = ""
@@ -182,12 +255,69 @@ export default function UseForm() {
             temp["baselocation"] = fieldValues.baselocation ? "" : "This field is required."
         if ("companyaddress" in fieldValues)
             temp["companyaddress"] = fieldValues.companyaddress ? "" : "This field is required."
+            if ("pincode" in fieldValues){
+                temp.pincode = fieldValues.pincode ? "" : "This field is required."
+                if (fieldValues.pincode){
+                    temp.pincode = (/^.{2,}$/).test(fieldValues.pincode)
+                    ? ""
+                    : "Pincode should have minimum 2 characters."
+                    if (errors.state)
+                        temp.state = temp.pincode ? "This field is required." : ""
+                    if (errors.district)
+                        temp.district = temp.pincode ? "This field is required." : ""
+                    if (errors.city)
+                        temp.city = temp.pincode ? "This field is required." : ""
+                }
+            }
+            if ("country" in fieldValues){
+                temp.country = fieldValues.country || formData.country ? "" : "This field is required."
+            }
+            if ("state" in fieldValues)
+                temp.state = fieldValues.state ? "" : "This field is required."
+            if ("district" in fieldValues)
+                temp.district = fieldValues.district || formData.district ? "" : "This field is required."
+            if ("city" in fieldValues)
+                temp.city = fieldValues.city || formData.city ? "" : "This field is required."
         
-        setTimeout(() => {
+                setTimeout(() => {
             setErrors({...temp})    
         }, 100)
-        console.log("from temp",temp)
-        console.log("from errors",errors)
+
+    }
+
+    //new
+    const handelInvalidPincode = () => {
+        let new_form = {...formData}
+        new_form['city'] = '';
+        new_form['district'] = '';
+        new_form['state'] = '';
+        new_form['pincode'] = '';
+        setformData(new_form);
+    }
+
+    //new
+    const getAddressByPincode = async(pincode) => {
+        console.log("fetching pincode details...")
+        try {
+            await axios.get('http://localhost:4000/location',
+                {headers: {
+                    'pincode': pincode,
+                    'country' : ccode.ccode
+                }}
+            )
+            .then(res=>{
+                if(res.data){
+                    dispatch(setLoc(res.data))}
+                else if(!res.data && formData.city ===''){
+                    window.alert("Invalid Pincode!")
+                    handelInvalidPincode()
+                }
+            })
+            
+        } catch (error){
+            console.log(error)
+        }
+        console.log("fetched!")
     }
 
     // End handel errors
@@ -197,6 +327,12 @@ export default function UseForm() {
         e.target.id?
         new_form['contacts'][e.target.name][e.target.id] = e.target.value:
         new_form[e.target.name] = e.target.value;
+        
+        if (e.target.name === 'pincode'){
+            new_form['city'] = '';
+            new_form['district'] = '';
+            new_form['state'] = '';
+        }
         if (e.target.name === 'primaryContact' || e.target.name === 'secondaryContact')
             validate(e.target.name, { [e.target.id]: e.target.value });
         if (e.target.id && e.target.name !== 'primaryContact' && e.target.name !== 'secondaryContact')
@@ -227,8 +363,37 @@ export default function UseForm() {
             setAddOthers(false)
         }
         setformData(new_form);
-        console.log(errors)
+        console.log(new_form,"updated--")
     }
+
+    const handelAddressOnBlur = (e) => {
+        setformvalue(e);
+        const data = e.target.value;
+        if (data.length > 1 && formData.pincode !== '' && errors.pincode === ''){
+            getAddressByPincode(data);
+        }
+    }
+
+    const handelCountry = (e) => {
+        let new_form = {...formData}
+        const data = e.target.value;
+        const name = e.target.name;
+        console.log("country ---  ",data.split('-')[1])
+        if (name === 'country'){
+            dispatch(setCcode(data.split('-')[1]));
+            new_form['city'] = '';
+            new_form['district'] = '';
+            new_form['state'] = '';
+            new_form['pincode'] = '';
+        }
+        new_form[name] = data;
+        if (name === 'district' && data !== ''){
+            new_form['state'] = loc.loc.state;
+            new_form['city'] = loc.loc['districts'][data][0];
+        }
+        setformData(new_form);
+    }
+    //new)
 
     const handleAddOthers = () => {
         let new_form = {...formData}
@@ -265,12 +430,10 @@ export default function UseForm() {
         const token = localStorage.getItem('authorization')
         try {
             await axios.post('http://localhost:4000/cims', {formData},  
-                                                    {headers: {
-                                                        'authorization': `bearer ${token}`
-                                                        }}) 
+                                                    {headers: {'authorization': `bearer ${token}`}}) 
             .then(res=>{
-                alert('Client Created Successfully!') 
                 console.log(res)
+                alert('Client Created Successfully!')     
             })  
             
         } catch (error) {
@@ -281,13 +444,11 @@ export default function UseForm() {
 
     const handleSaveBtn = () =>{
         return(
-            formData.designation === "" || formData.brandname === "" || formData.domain === "" || formData.baselocation === "" || formData.clientname === "" ||formData.companyaddress === "" || 
+            formData.designation === "" || formData.brandname === "" || formData.domain === "" || formData.baselocation === "" || formData.clientname === "" ||  formData.addressLine1 === "" || formData.country === "" || formData.pincode === ""  || formData.state === "" || formData.district === ""  || formData.city === "" ||
             formData.contacts.primaryContact.title === "" || formData.contacts.primaryContact.firstName === "" || formData.contacts.primaryContact.lastName === "" || formData.contacts.primaryContact.email === "" || formData.contacts.primaryContact.contactNumber === "" ||
             formData.contacts.secondaryContact.title === "" || formData.contacts.secondaryContact.firstName === "" || formData.contacts.secondaryContact.lastName === "" || formData.contacts.secondaryContact.email === "" || formData.contacts.secondaryContact.contactNumber === ""
         )   
     } 
-
-    //end Sam
 
     return {
         fields,
@@ -295,6 +456,7 @@ export default function UseForm() {
         value,
         setformvalue,
         contacts,
+        contactSchema,
         setValue,
         open,
         handleClick,
@@ -303,11 +465,19 @@ export default function UseForm() {
         n,
         handleOthers,
         addOthers,
+        initialFormValues2,
         handleAddOthers,
         errors,
         handleSaveBtn,
         authStore,
         submitForm,
-        setformData
+        setformData,
+        handelCountry,
+        addressFields,
+        handelAddressOnBlur,
+        initialContacts,
+        validate,
+        validateBasic,
+        validateOptional,
     }
 }

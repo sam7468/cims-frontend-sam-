@@ -1,3 +1,6 @@
+
+// old update form
+
 import React, { useEffect, useState } from 'react'
 import { Typography } from '@mui/material'
 import axios from 'axios'
@@ -12,72 +15,36 @@ import { TabContext, TabList, TabPanel } from "@mui/lab";
 import { KeyboardArrowDownRounded as KeyboardArrowDownRoundedIcon,
     AddRounded as AddRoundedIcon,
 } from '@mui/icons-material';
-import UseForm from './Create-UseForm';
+import UseForm from './Update-UseForm';
 import '../styles/FormStyle.css'
-import { useSelector,useDispatch } from "react-redux";
-import setCcode from "../actions/SetcCode";
-import setLoc from "../actions/SetLoc"
 
-const useStyles = makeStyles({  
-    formControl: {
-        width: '100%'
-    }
 
-})
-
-function UpdateForm(){
-
-    const clientdata = useSelector(state=>state.clientformdata)
-    const editstate = useSelector(state=>state.editmode)
-
-    const classes = useStyles()    
-
-    async function fetchData() {
-        const response = await fetch('http://localhost:4000/countries');
-        const data = await response.json();
-        setCountries(data)
-    }
+function UpdateForm(props){
 
     const {
         fields,
         initialContacts,
         contactSchema,
-        initialFormValues2,
-        addressFields,
-
+        initialFormValues2
     } = UseForm()
 
-    const initialFormValues = clientdata.data[0]
-    
-    const ccode = useSelector(state => state.getaddress);
-    const loc = useSelector(state => state.getaddress);
-
-    const dispatch = useDispatch();
-
-    const [countries,setCountries] = useState({})
+    const initialFormValues = props.data[0]
 
     const errorValues =  JSON.parse(JSON.stringify(initialFormValues2));
     const [anchorEl, setAnchorEl] = useState(null);
-    const [editMode,seteditMode] = useState(editstate.editmode)
+    const [editMode,seteditMode] = useState(props.editmode)
     const [value, setValue] = useState('primaryContact');
     const [contacts, setContacts] = useState(initialContacts);
     const [formData,setformData] = useState(initialFormValues);
     const [n, setN] = useState(Object.keys(formData.contacts).length);
     const [addOthers, setAddOthers] = useState(false);
     const [errors, setErrors] = useState(errorValues);  
+    console.log(errors,"check errs")
 
-    const open = Boolean(anchorEl);
-    const handleClick = (event) => {
-        setAnchorEl(event.currentTarget);
-    };
-    const handleClose = () => {
-        setAnchorEl(null);
-    }; 
 
     const {id} = useParams()
 
     useEffect(async() => {
-      fetchData()  
       const token = localStorage.getItem('authorization')
       await axios.get('http://localhost:4000/getclientinfo', {headers: {'authorization': `bearer ${token}`,
                                                                          'id':id }})
@@ -95,8 +62,16 @@ function UpdateForm(){
         })
 
       },[])   
+    
 
-
+    const open = Boolean(anchorEl);
+    const handleClick = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+    const handleClose = () => {
+        setAnchorEl(null);
+    }; 
+    
     const handleOthers = (e) => {
         const d = e.currentTarget.dataset;
         setContacts([...initialContacts, {...d}]);
@@ -127,13 +102,6 @@ function UpdateForm(){
                 ? ""
                 : "Contact number is not valid."
         }
-        if ("otherContactNumber" in fieldValues){
-            temp['contacts'][type].otherContactNumber = fieldValues.otherContactNumber ? "" : "This field is required."
-            if (fieldValues.otherContactNumber)
-                temp['contacts'][type].otherContactNumber = (/^[6-9][0-9]{9}$/).test(fieldValues.otherContactNumber)
-                ? ""
-                : "Other contact number is not valid."
-        }
 
         setErrors({
             ...temp
@@ -144,7 +112,10 @@ function UpdateForm(){
         let temp = { ...errors }
         if (fieldValues.title || fieldValues.firstName || fieldValues.lastName ||
             fieldValues.email || fieldValues.contactNumber || fieldValues.otherContactNumber){
-
+                temp['contacts'][type].title = fieldValues.title ? "" : "This field is required."
+                temp['contacts'][type].firstName = fieldValues.firstName ? "" : "This field is required."
+                temp['contacts'][type].lastName = fieldValues.lastName ? "" : "This field is required."
+                temp['contacts'][type].email = fieldValues.email ? "" : "This field is required."
                 if (fieldValues.email)
                     temp['contacts'][type].email = (/^[^@\s]+@[^@\s]+\.[^@\s]{2,4}$/).test(fieldValues.email)
                     ? ""
@@ -159,10 +130,7 @@ function UpdateForm(){
                     temp['contacts'][type].otherContactNumber = (/^[6-9][0-9]{9}$/).test(fieldValues.otherContactNumber)
                     ? ""
                     : "Other contact number is not valid."
-                else
-                    temp['contacts'][type].otherContactNumber = ''    
-                }
-
+        }
         else{
             temp['contacts'][type].title = ""
             temp['contacts'][type].firstName = ""
@@ -194,93 +162,18 @@ function UpdateForm(){
             temp["baselocation"] = fieldValues.baselocation ? "" : "This field is required."
         if ("companyaddress" in fieldValues)
             temp["companyaddress"] = fieldValues.companyaddress ? "" : "This field is required."
-            if ("companyaddress" in fieldValues)
-            temp["companyaddress"] = fieldValues.companyaddress ? "" : "This field is required."
-            if ("pincode" in fieldValues){
-                temp.pincode = fieldValues.pincode ? "" : "This field is required."
-                if (fieldValues.pincode){
-                    temp.pincode = (/^.{2,}$/).test(fieldValues.pincode)
-                    ? ""
-                    : "Pincode should have minimum 2 characters."
-                    if (errors.state)
-                        temp.state = temp.pincode ? "This field is required." : ""
-                    if (errors.district)
-                        temp.district = temp.pincode ? "This field is required." : ""
-                    if (errors.city)
-                        temp.city = temp.pincode ? "This field is required." : ""
-                }
-            }
-            if ("country" in fieldValues){
-                temp.country = fieldValues.country || formData.country ? "" : "This field is required."
-            }
-            if ("state" in fieldValues)
-                temp.state = fieldValues.state ? "" : "This field is required."
-            if ("district" in fieldValues)
-                temp.district = fieldValues.district || formData.district ? "" : "This field is required."
-            if ("city" in fieldValues)
-                temp.city = fieldValues.city || formData.city ? "" : "This field is required."
         
         setTimeout(() => {
             setErrors({...temp})    
         }, 100)
+
     }
-
-      //new
-      const handelInvalidPincode = () => {
-        let new_form = {...formData}
-        new_form['city'] = '';
-        new_form['district'] = '';
-        new_form['state'] = '';
-        new_form['pincode'] = '';
-        setformData(new_form);
-    }
-
-    const handleSaveBtn = () =>{
-        return(
-            formData.designation === "" || formData.brandname === "" || formData.domain === "" || formData.baselocation === "" || formData.clientname === "" || formData.addressLine1 === "" || formData.country === "" || formData.pincode === ""  || formData.state === "" || formData.district === ""  || formData.city === "" ||
-            formData.contacts.primaryContact.title === "" || formData.contacts.primaryContact.firstName === "" || formData.contacts.primaryContact.lastName === "" || formData.contacts.primaryContact.email === "" || formData.contacts.primaryContact.contactNumber === "" ||
-            formData.contacts.secondaryContact.title === "" || formData.contacts.secondaryContact.firstName === "" || formData.contacts.secondaryContact.lastName === "" || formData.contacts.secondaryContact.email === "" || formData.contacts.secondaryContact.contactNumber === ""
-        )   
-    } 
-
-    const getAddressByPincode = async(pincode) => {
-        console.log("In getAddressByPincode")
-        try {
-            await axios.get('http://localhost:4000/location',
-                {headers: {
-                    'pincode': pincode,
-                    'country' : ccode.ccode
-                }}
-            )
-            .then(res=>{
-                console.log("pincode data -- - - - ",res.data)
-                if(res.data){
-                    dispatch(setLoc(res.data))}
-                else if(!res.data && formData.city ===''){
-                    window.alert("Invalid Pincode!")
-                    handelInvalidPincode()
-                }
-            })
-            
-        } catch (error){
-            console.log(error)
-        }
-        console.log("End getAddressByPincode")
-    }
-
-
     
     const setformvalue=(e)=>{
         let new_form = {...formData}
         e.target.id?
         new_form['contacts'][e.target.name][e.target.id] = e.target.value:
         new_form[e.target.name] = e.target.value;
-        
-        if (e.target.name === 'pincode'){
-            new_form['city'] = '';
-            new_form['district'] = '';
-            new_form['state'] = '';
-        }
         if (e.target.name === 'primaryContact' || e.target.name === 'secondaryContact')
             validate(e.target.name, { [e.target.id]: e.target.value });
         if (e.target.id && e.target.name !== 'primaryContact' && e.target.name !== 'secondaryContact')
@@ -313,35 +206,6 @@ function UpdateForm(){
         setformData(new_form);
         console.log(new_form," --> from onchange data")
     }
-
-    const handelAddressOnBlur = (e) => {
-        setformvalue(e);
-        const data = e.target.value;
-        if (data.length > 1 && formData.pincode !== '' && errors.pincode === ''){
-            getAddressByPincode(data);
-        }
-    }
-
-    const handelCountry = (e) => {
-        let new_form = {...formData}
-        const data = e.target.value;
-        const name = e.target.name;
-        console.log("country ---  ",data.split('-')[1])
-        if (name === 'country'){
-            dispatch(setCcode(data.split('-')[1]));
-            new_form['city'] = '';
-            new_form['district'] = '';
-            new_form['state'] = '';
-            new_form['pincode'] = '';
-        }
-        new_form[name] = data;
-        if (name === 'district' && data !== ''){
-            new_form['state'] = loc.loc.state;
-            new_form['city'] = loc.loc['districts'][data][0];
-        }
-        setformData(new_form);
-    }
-    //new)
 
     const handleAddOthers = () => {
         let new_form = {...formData}
@@ -381,6 +245,15 @@ function UpdateForm(){
     }
 
 
+    const handleSaveBtn = () =>{
+        return(
+            formData.designation === "" || formData.brandname === "" || formData.domain === "" || formData.baselocation === "" || formData.clientname === "" ||formData.companyaddress === "" || 
+            formData.contacts.primaryContact.title === "" || formData.contacts.primaryContact.firstName === "" || formData.contacts.primaryContact.lastName === "" || formData.contacts.primaryContact.email === "" || formData.contacts.primaryContact.contactNumber === "" ||
+            formData.contacts.secondaryContact.title === "" || formData.contacts.secondaryContact.firstName === "" || formData.contacts.secondaryContact.lastName === "" || formData.contacts.secondaryContact.email === "" || formData.contacts.secondaryContact.contactNumber === ""
+        )   
+    } 
+
+
     const contactFields = fields.map(field => {
         const data = formData.contacts[value];
         return(
@@ -388,137 +261,26 @@ function UpdateForm(){
             <Grid item xs={12} sm={6} md={4} key={`${value}.${field.id}`}>
                 
                 <TextField 
-                    InputProps={!editMode && {readOnly: true, disableUnderline: false}}
+                    key={data[field.id]}
                     variant="outlined"
+                    {...(editMode && {autoFocus:"autoFocus"})}
                     label={field.label}
                     name={value}
-                    defaultValue={data[field.id]}
-                    {...(formData[field.id] === "" && {key:formData[field.id],autoFocus:"autoFocus"})}
-                    Inputprops={!editMode && {readOnly: true}}
+                    InputProps={!editMode && {readOnly: true}}
                     id={field.id}
+                    defaultValue={data[field.id] ?? " "}
                     onChange={(e)=>{setformvalue(e)}}
                     onBlur={setformvalue}
                     fullWidth
                     size="small"
                     autoComplete="none"
-                    {...(errors['contacts'][value][field.id] && { error: true, helperText: errors['contacts'][value][field.id] })}
+                    // {...(errors['contacts'][value][field.id] && { error: true, helperText: errors['contacts'][value][field.id] })}
                 />
             </Grid>
         );
     });
 
-     //
-     
-     const addressField = addressFields.map(field => {
-        const gridStyle = field.name === 'addressLine1' || field.name === 'addressLine2' ? 12 : 6 
-        if (field.name === 'country'){
-            return(
-                
-                <Grid item xs={12} sm={gridStyle}>
-                    <FormControl size="small" className={classes.formControl}>
-                        <InputLabel id="country">{field.label}</InputLabel>
-                        <Select labelId="country"
-                            Inputprops={!editMode && {readOnly: true, disableUnderline: false}}
-                            name={field.name}
-                            value={formData[field.name]}
-                            defaultValue={formData[field.name]}
-                            label={field.label}
-                            onChange={handelCountry}
-                            onBlur={handelCountry}
-                        >
-                            {Object.keys(countries).map((key) => (
-                                <MenuItem
-                                    disabled = {!editMode}
-                                    key={key}
-                                    value={`${countries[key].name}-${countries[key].code}`}
-                                >
-                                {countries[key].name}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
-                </Grid>
-            );
-        }
-        
-        if (field.name === 'district' && formData.pincode !== '' && Object.keys(loc.loc['districts'])[0].length>1){
-            return(
-                <Grid item xs={12} sm={gridStyle}>
-                    <FormControl size="small" className={classes.formControl}>
-                        <InputLabel id="district">{field.label}</InputLabel>
-                        <Select labelId="district"
-                            name={field.name}
-                            value={formData[field.name]}
-                            label={field.label}
-                            onChange={handelCountry}
-                            onBlur={handelCountry}
-                        >
-                            {console.log("-----",Object.keys(loc.loc['districts']),"-----")}
-                            {Object.keys(loc.loc['districts']).map((key) => (
-                                <MenuItem
-                                    key={key}
-                                    value={key}
-                                >
-                                {key}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
-                </Grid>
-            );
-        }
 
-        console.log("err part---",loc.loc['districts'] , formData)
-        if (field.name === 'city' && formData.district !== '' && formData.pincode !== '' && loc.loc['districts'][formData['district']] ? loc.loc['districts'][formData['district']].length>1 : false){
-            return(
-                <Grid item xs={12} sm={gridStyle}>
-                    <FormControl size="small" className={classes.formControl}>
-                        <InputLabel id="city">{field.label}</InputLabel>
-                        <Select labelId="city"
-                            name={field.name}
-                            label={field.label}
-                            onChange={handelCountry}
-                            onBlur={handelCountry}
-                        >
-                            {loc.loc['districts'][formData['district']].map((dist) => (
-                                <MenuItem
-                                    key={dist}
-                                    value={dist}
-                                >
-                                {dist}
-                                </MenuItem>
-                            )) || ""}
-                        </Select>
-                    </FormControl>
-                </Grid>
-            );
-        }
-        return(
-
-
-            <Grid item sm={gridStyle}>
-                
-                <TextField
-                    
-                    InputProps={!editMode && {readOnly: true, disableUnderline: false}}
-                    label={field.label}
-                    variant="outlined"
-                    name={field.name}
-                    fullWidth
-                    size="small"
-                    defaultValue={formData[field.name]}
-                    {...(formData[field.name] === "" && {key:formData[field.name],autoFocus:"autoFocus"})}
-                    onChange={(e)=>{setformvalue(e)}}
-                    onBlur={handelAddressOnBlur}
-                    {...(errors[field.name] && 
-                    { error: true, helperText: errors[field.name] })}
-                />
-            </Grid> 
-
-       
-        );
-    });
-//
     const tabs = contacts.map(contact =>
         <Tab key={contact.title} label={contact.label} value={contact.title} sx={{textTransform: 'none'}}/>
     );
@@ -544,7 +306,7 @@ function UpdateForm(){
                     anchorEl={anchorEl}
                     open={open}
                     onClose={handleClose}
-                    MenuListprops={{
+                    MenuListProps={{
                         'aria-labelledby': 'othersBtn',
                     }}
                 >
@@ -577,7 +339,7 @@ function UpdateForm(){
                     <div className="header-end">
                         <div>
                             <p>Edit mode</p>
-                            <Switch defaultChecked={editstate.editmode}  onClick={()=>{seteditMode(!editMode)}} color="success" />
+                            <Switch defaultChecked={props.editmode}  onClick={()=>{seteditMode(!editMode)}} color="success" />
                         </div>
                     </div>
                 </div>
@@ -588,11 +350,12 @@ function UpdateForm(){
                             Legal Name of the entity
                         </Typography>
                         <TextField
+                            key={`slide${formData.designation}`}
+                            {...(editMode && {autoFocus:"autoFocus"})}
                             InputProps={!editMode && {readOnly: true, disableUnderline: false}}
                             variant="outlined"
                             name="designation"
-                            defaultValue={formData.designation}
-                            {...(formData.designation === "" && {key:formData.designation,autoFocus:"autoFocus"})}
+                            defaultValue={formData.designation ?? ""}
                             fullWidth
                             required
                             size="small"
@@ -605,15 +368,15 @@ function UpdateForm(){
                         <Grid container spacing={2} >
                                 <Grid container item xs={6} direction="column" >            
                                     <div >
-                                        <Typography >
+                                        <Typography>
                                             Brand Name
                                         </Typography>
                                         <TextField
+                                            key={formData.brandname}
+                                            {...(editMode && {autoFocus:"autoFocus"})}
                                             variant="outlined"
                                             InputProps={!editMode && {readOnly: true, disableUnderline: true}}                                            defaultValue={formData.brandname ?? " "}
                                             name="brandname"
-                                            defaultValue={formData.brandname}
-                                            {...(formData.brandname === "" && {key:formData.brandname,autoFocus:"autoFocus"})}
                                             fullWidth
                                             required
                                             size="small"
@@ -629,11 +392,11 @@ function UpdateForm(){
                                         Base Location
                                     </Typography>
                                     <TextField
+                                        key={formData.baselocation}
+                                        {...(editMode && {autoFocus:"autoFocus"})}
                                         variant="outlined"
                                         name="baselocation"
                                         InputProps={!editMode && {readOnly: true, disableUnderline: true}}                                        defaultValue={formData.baselocation ?? " "}
-                                        defaultValue={formData.baselocation}
-                                        {...(formData.baselocation === "" && {key:formData.baselocation,autoFocus:"autoFocus"})}
                                         fullWidth
                                         required
                                         size="small"
@@ -652,11 +415,11 @@ function UpdateForm(){
                                         Domain/Sector
                                     </Typography>
                                     <TextField
+                                        key={formData.domain}
+                                        {...(editMode && {autoFocus:"autoFocus"})}
                                         variant="outlined"
                                         name="domain"
                                         InputProps={!editMode && {readOnly: true, disableUnderline: true}}                                        defaultValue={formData.domain ?? " "}
-                                        defaultValue={formData.domain}
-                                        {...(formData.domain === "" && {key:formData.domain,autoFocus:"autoFocus"})}
                                         fullWidth
                                         required
                                         size="small"
@@ -675,19 +438,20 @@ function UpdateForm(){
                                     <FormControl fullWidth>
                                         <InputLabel id="label">Select a Client name</InputLabel>
                                         <Select
+                                        key={formData.clientname}
                                         name="clientname"
-                                        defaultValue={formData.clientname}
-                                        {...(formData.clientname === "" && {key:formData.clientname,autoFocus:"autoFocus"})}
+                                        {...(editMode && {autoFocus:"autoFocus"})}
                                         onChange={setformvalue}
+                                        disabled = {!editMode}
                                         InputProps={!editMode && {readOnly: true, disableUnderline: true}}                                        onBlur={(e)=>{setformvalue(e)}}
                                         {...(errors.clientname && 
                                         { error: true, helperText: errors.clientname })}
                                         size="small"
                                         input={<OutlinedInput label="Select a Client name" />}
                                         >
-                                        <MenuItem disabled = {!editMode} value={"client 1"}>client 1</MenuItem>
-                                        <MenuItem disabled = {!editMode} value={"client 2"}>client 2</MenuItem>
-                                        <MenuItem disabled = {!editMode} value={"client 3"}>client 3</MenuItem>
+                                        <MenuItem value={"client 1"}>client 1</MenuItem>
+                                        <MenuItem value={"client 2"}>client 2</MenuItem>
+                                        <MenuItem value={"client 3"}>client 3</MenuItem>
                                         </Select>
                                     </FormControl>
                                     </Box>
@@ -695,13 +459,24 @@ function UpdateForm(){
                             </Grid>
                         </Grid>
 
-
                         <Typography>
                             Complete address of the company
-                        </Typography>                        
-                        <Grid container spacing={2} justify="space-between" >    
-                        {addressField}
-                        </Grid>
+                        </Typography>
+                        
+                        <TextField
+                            key={formData.companyaddress}
+                            variant="outlined"
+                            name="companyaddress"
+                            {...(editMode && {autoFocus:"autoFocus"})}
+                            InputProps={!editMode && {readOnly: true, disableUnderline: true}}                            defaultValue={formData.companyaddress ??  " "}
+                            fullWidth
+                            required
+                            size="small"
+                            onChange={setformvalue}
+                            onBlur={(e)=>{setformvalue(e)}}
+                            {...(errors.companyaddress && 
+                            { error: true, helperText: errors.companyaddress })}
+                        />
 
                         <a href="/">
                             <Button
@@ -779,3 +554,4 @@ function UpdateForm(){
 }
 
 export default UpdateForm
+

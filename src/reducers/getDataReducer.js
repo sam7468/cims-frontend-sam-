@@ -18,7 +18,14 @@ const clientDataReducer = (state = clientdata, action) => {
               "clientname": "",
               "domain": "",
               "baselocation": "",
-              "companyaddress": "",
+              "addressLine1":"",
+              "addressLine2":"",
+              "pincode":"",
+              "country":"",
+              "state":"",
+              "district":"",
+              "city":"",
+              "landmark":"",
               "contacts": {
                   "primaryContact": {
                       "title": "",

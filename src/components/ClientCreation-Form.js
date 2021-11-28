@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import {Link} from 'react-router-dom'
 import { Typography } from '@mui/material'
 import { makeStyles } from '@material-ui/styles';
@@ -10,13 +10,38 @@ import { Box, Tab, Grid, TextField, Button, MenuItem, Menu, FormControl } from "
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import { KeyboardArrowDownRounded as KeyboardArrowDownRoundedIcon,
     AddRounded as AddRoundedIcon,
-    PhoneEnabled
 } from '@mui/icons-material';
 import '../styles/FormStyle.css'
 import UseForm from './Create-UseForm';
+import { useSelector } from 'react-redux';
 
+
+const useStyles = makeStyles({  
+    formControl: {
+        width: '100%'
+    }
+
+})
 
 function CreateForm(){
+
+    const classes = useStyles()
+
+    async function fetchData() {
+        const response = await fetch('http://localhost:4000/countries');
+        const data = await response.json();
+        setCountries(data)
+    }
+
+    useEffect(()=>{
+        fetchData()
+    },[])
+
+    const [countries,setCountries] = useState({})
+    const loc = useSelector(state => state.getaddress);
+    console.log(loc,"locccccccccc")
+
+    
 
     const {
         fields,
@@ -36,7 +61,10 @@ function CreateForm(){
         handleSaveBtn,
         errors,
         authStore,
-        submitForm
+        submitForm,
+        addressFields,
+        handelCountry,
+        handelAddressOnBlur,
     } = UseForm();
 
 
@@ -61,6 +89,107 @@ function CreateForm(){
         );
     });
 
+
+    //
+    const addressField = addressFields.map(field => {
+        const gridStyle = field.name === 'addressLine1' || field.name === 'addressLine2' ? 12 : 6
+        if (field.name === 'country'){
+            return(
+                <Grid item xs={12} sm={gridStyle}>
+                    <FormControl size="small" className={classes.formControl}>
+                        <InputLabel id="country">{field.label}</InputLabel>
+                        <Select labelId="country"
+                            name={field.name}
+                            value={formData[field.name]}
+                            label={field.label}
+                            onChange={handelCountry}
+                            onBlur={handelCountry}
+                        >
+                            {Object.keys(countries).map((key) => (
+                                <MenuItem
+                                    key={key}
+                                    value={`${countries[key].name}-${countries[key].code}`}
+                                >
+                                {countries[key].name}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                </Grid>
+            );
+        }
+        
+        if (field.name === 'district' && formData.pincode !== '' && Object.keys(loc.loc['districts'])[0].length>1){
+            return(
+                <Grid item xs={12} sm={gridStyle}>
+                    <FormControl size="small" className={classes.formControl}>
+                        <InputLabel id="district">{field.label}</InputLabel>
+                        <Select labelId="district"
+                            name={field.name}
+                            value={formData[field.name]}
+                            label={field.label}
+                            onChange={handelCountry}
+                            onBlur={handelCountry}
+                        >
+                            {console.log("-----",Object.keys(loc.loc['districts']),"-----")}
+                            {Object.keys(loc.loc['districts']).map((key) => (
+                                <MenuItem
+                                    key={key}
+                                    value={key}
+                                >
+                                {key}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                </Grid>
+            );
+        }
+        
+        if (field.name === 'city' && formData.district !== '' && formData.pincode !== '' && loc.loc['districts'][formData['district']] ? loc.loc['districts'][formData['district']].length>1 : false){
+            return(
+                <Grid item xs={12} sm={gridStyle}>
+                    <FormControl size="small" className={classes.formControl}>
+                        <InputLabel id="city">{field.label}</InputLabel>
+                        <Select labelId="city"
+                            name={field.name}
+                            value={formData[field.name]}
+                            label={field.label}
+                            onChange={handelCountry}
+                            onBlur={handelCountry}
+                        >
+                            {loc.loc['districts'][formData['district']].map((dist) => (
+                                <MenuItem
+                                    key={dist}
+                                    value={dist}
+                                >
+                                {dist}
+                                </MenuItem>
+                            )) || ""}
+                        </Select>
+                    </FormControl>
+                </Grid>
+            );
+        }
+        return(
+            <Grid item xs={12} sm={gridStyle}>
+                <TextField
+                    label={field.label}
+                    variant="outlined"
+                    name={field.name}
+                    fullWidth
+                    size="small"
+                    value={formData[field.name]}
+                    onChange={(e)=>{setformvalue(e)}}
+                    onBlur={handelAddressOnBlur}
+                    {...(errors[field.name] && 
+                    { error: true, helperText: errors[field.name] })}
+                />
+                
+            </Grid>
+        );
+    });
+//
 
     const tabs = contacts.map(contact =>
         <Tab key={contact.title} label={contact.label} value={contact.title} sx={{textTransform: 'none'}}/>
@@ -233,18 +362,10 @@ function CreateForm(){
                             Complete address of the company
                         </Typography>
                         
-                        {/* <TextField
-                            label="Enter location"
-                            variant="outlined"
-                            name="companyaddress"
-                            fullWidth
-                            required
-                            size="small"
-                            onChange={setformvalue}
-                            onBlur={(e)=>{setformvalue(e)}}
-                            {...(errors.companyaddress && 
-                            { error: true, helperText: errors.companyaddress })}
-                        /> */}
+                        <Grid container spacing={2} >    
+                        {addressField}
+                        </Grid>
+
 
                         <a href="/">
                             <Button
