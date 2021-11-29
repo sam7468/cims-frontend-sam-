@@ -438,7 +438,7 @@ function UpdateForm(props){
                             value={formData[field.name]}
                             label={field.label}
                             onChange={handelCountry}
-                            // onBlur={editMode && handelCountry}
+                            onBlur={editMode && handelCountry}
                         >
                             {console.log("-----",Object.keys(loc.loc['districts']),"-----")}
                             {Object.keys(loc.loc['districts']).map((key) => (
@@ -465,7 +465,7 @@ function UpdateForm(props){
                             name={field.name}
                             label={field.label}
                             onChange={handelCountry}
-                            // onBlur={editMode && handelCountry}
+                            onBlur={editMode && handelCountry}
                         >
                             {loc.loc['districts'][formData['district']].map((dist) => (
                                 <MenuItem
