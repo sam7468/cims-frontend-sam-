@@ -577,7 +577,7 @@ function UpdateForm(props){
                             required
                             size="small"
                             onChange={(e)=>{setformvalue(e)}}
-                            onBlur={setformvalue}
+                            onBlur={editMode && setformvalue}
                             {...(errors.designation && 
                             { error: true, helperText: errors.designation })}  
                         />
@@ -599,7 +599,7 @@ function UpdateForm(props){
                                             required
                                             size="small"
                                             onChange={(e)=>{setformvalue(e)}}
-                                            onBlur={setformvalue}
+                                            onBlur={editMode && setformvalue}
                                             {...(errors.brandname && 
                                             { error: true, helperText: errors.brandname })}
                                         />
@@ -620,7 +620,7 @@ function UpdateForm(props){
                                         required
                                         size="small"
                                         onChange={(e)=>{setformvalue(e)}}
-                                        onBlur={setformvalue}
+                                        onBlur={editMode && setformvalue}
                                         {...(errors.baselocation && 
                                         { error: true, helperText: errors.baselocation })}
                                         />
@@ -643,7 +643,7 @@ function UpdateForm(props){
                                         required
                                         size="small"
                                         onChange={(e)=>{setformvalue(e)}}
-                                        onBlur={setformvalue}
+                                        onBlur={editMode && setformvalue}
                                         {...(errors.domain && 
                                         { error: true, helperText: errors.domain })}
                                     />
@@ -662,7 +662,8 @@ function UpdateForm(props){
                                         defaultValue={formData.clientname}
                                         {...(formData.clientname === "" && {key:formData.clientname,autoFocus:"autoFocus"})}
                                         onChange={setformvalue}
-                                        InputProps={!editMode && {readOnly: true, disableUnderline: true}}                                        onBlur={(e)=>{setformvalue(e)}}
+                                        InputProps={!editMode && {readOnly: true, disableUnderline: true}} 
+                                        onBlur={editMode && setformvalue}
                                         {...(errors.clientname && 
                                         { error: true, helperText: errors.clientname })}
                                         size="small"
