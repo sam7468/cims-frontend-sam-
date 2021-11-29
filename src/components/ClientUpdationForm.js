@@ -146,13 +146,10 @@ function UpdateForm(props){
         console.log("End getAddressByPincode")
     }
 
-
-    
-
     const handelAddressOnBlur = (e) => {
         setformvalue(e);
         const data = e.target.value;
-        if (data.length > 1 && formData.pincode !== '' && errors.pincode === ''){
+        if (data.length > 1 && formData.pincode !== '' && errors.pincode === '' && e.target.name === "pincode"){
             getAddressByPincode(data);
         }
     }
@@ -173,7 +170,7 @@ function UpdateForm(props){
         new_form[name] = data;
         if (name === 'district' && data !== ''){
             new_form['state'] = loc.loc.state;
-            new_form['city'] = loc.loc['districts'][data][0];
+            new_form['city'] = loc.loc['districts'][data][0] ? loc.loc['districts'][data][0] : ""
         }
         setformData(new_form);
     }
@@ -377,6 +374,7 @@ function UpdateForm(props){
         return(
             <Grid item xs={12} sm={6} md={4} key={`${value}.${field.id}`}> 
                 <TextField 
+                    autoFocus={true}
                     InputProps={!editMode && {readOnly: true, disableUnderline: false}}
                     variant="outlined"
                     label={field.label}
@@ -484,6 +482,7 @@ function UpdateForm(props){
         return(
             <Grid item sm={gridStyle}> 
                 <TextField
+                    autoFocus={true}
                     InputProps={!editMode && {readOnly: true, disableUnderline: true}}
                     label={field.label}
                     variant="outlined"
@@ -572,6 +571,7 @@ function UpdateForm(props){
                             Legal Name of the entity
                         </Typography>
                         <TextField
+                            autoFocus={true}
                             InputProps={!editMode && {readOnly: true, disableUnderline: false}}
                             variant="outlined"
                             name="designation"
@@ -613,6 +613,7 @@ function UpdateForm(props){
                                         Base Location
                                     </Typography>
                                     <TextField
+                                        autoFocus={true}
                                         variant="outlined"
                                         name="baselocation"
                                         InputProps={!editMode && {readOnly: true, disableUnderline: true}}                                        defaultValue={formData.baselocation ?? " "}
@@ -635,6 +636,7 @@ function UpdateForm(props){
                                         Domain/Sector
                                     </Typography>
                                     <TextField
+                                        autoFocus={true}
                                         variant="outlined"
                                         name="domain"
                                         InputProps={!editMode && {readOnly: true, disableUnderline: true}}                                        defaultValue={formData.domain ?? " "}
@@ -658,6 +660,7 @@ function UpdateForm(props){
                                     <FormControl fullWidth>
                                         <InputLabel id="label">Select a Client name</InputLabel>
                                         <Select
+                                        
                                         name="clientname"
                                         defaultValue={formData.clientname}
                                         {...(formData.clientname === "" && {key:formData.clientname,autoFocus:"autoFocus"})}
