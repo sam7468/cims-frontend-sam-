@@ -39,9 +39,6 @@ function CreateForm(){
 
     const [countries,setCountries] = useState({})
     const loc = useSelector(state => state.getaddress);
-    console.log(loc,"locccccccccc")
-
-    
 
     const {
         fields,
@@ -130,7 +127,6 @@ function CreateForm(){
                             onChange={handelCountry}
                             onBlur={handelCountry}
                         >
-                            {console.log("-----",Object.keys(loc.loc['districts']),"-----")}
                             {Object.keys(loc.loc['districts']).map((key) => (
                                 <MenuItem
                                     key={key}

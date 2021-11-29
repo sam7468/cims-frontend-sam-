@@ -1,10 +1,10 @@
 import './App.css';
 import { BrowserRouter , Route ,Routes } from 'react-router-dom';
-import Header from './components/staticComponents/Header';
-import PageHeader from './components/staticComponents/PageHeader';
+import Header from './components/Header';
+import PageHeader from './components/PageHeader';
 import CIMSTable from './components/ReadTable';
 import UpdateForm from './components/ClientUpdationForm';
-import CollapsibleSidebar from './components/staticComponents/Collapsible-Sidebar'
+import CollapsibleSidebar from './components/Collapsible-Sidebar'
 import CreateForm from './components/ClientCreation-Form';
 import {useSelector} from 'react-redux'
 

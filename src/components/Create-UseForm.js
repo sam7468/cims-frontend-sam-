@@ -4,6 +4,7 @@ import { useSelector,useDispatch } from "react-redux";
 import setCcode from "../actions/SetcCode";
 import setLoc from "../actions/SetLoc"
 
+
 const initialFormValues2 = {
     designation:"",
     brandname:"",
@@ -45,7 +46,6 @@ const initialFormValues2 = {
         }
     }
 }
-
 
 const initialFormValues = {
     designation:"",

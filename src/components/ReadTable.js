@@ -57,9 +57,7 @@ function CIMSTable() {
     })
 
     const token = localStorage.getItem('authorization')
-    await axios.get('http://localhost:4000/cims', {headers: {
-                                                      'authorization': `bearer ${token}`
-                                                      }})
+    await axios.get('http://localhost:4000/cims', {headers: {'authorization': `bearer ${token}`}})
     .then(data=>data)
     .then(list=>{
       setclientsList(list.data)
@@ -119,33 +117,28 @@ function CIMSTable() {
             <TableBody>
             {clientsList.map((client,idx) => (
                 <StyledTableRow className="table-row" key={client.id}>
-                  <StyledTableCell component="th" scope="client">
-                      {idx+1}
-                  </StyledTableCell>
-                  <StyledTableCell onClick={(e) => {editDisablefn()
-                     handleClientData(client._id)}} align="left">{client._id}</StyledTableCell>
-                  
-                  
-                  <StyledTableCell onClick={(e) => {editDisablefn()
-                  handleClientData(client._id)}} align="left">{client.brandname}</StyledTableCell>
-                  
-                  
-                  <StyledTableCell onClick={(e) => {editDisablefn()
-                  handleClientData(client._id)}} align="left">{client.contacts.primaryContact ? client.contacts.primaryContact.title : ""}</StyledTableCell>
-                  
-                  
-                  <StyledTableCell onClick={(e) => {handleClientData(client._id)
-                  editEnablefn()}} align="left">{EditButton()}</StyledTableCell>
-                </StyledTableRow>
+                      <StyledTableCell component="th" scope="client">
+                          {idx+1}
+                      </StyledTableCell>
+                      <StyledTableCell onClick={(e) => {editDisablefn()
+                        handleClientData(client._id)}} align="left">{client._id}</StyledTableCell>
+                      
+                      <StyledTableCell onClick={(e) => {editDisablefn()
+                      handleClientData(client._id)}} align="left">{client.brandname}</StyledTableCell>
+                      
+                      <StyledTableCell onClick={(e) => {editDisablefn()
+                      handleClientData(client._id)}} align="left">{client.contacts.primaryContact ? client.contacts.primaryContact.title : ""}</StyledTableCell>
+                      
+                      <StyledTableCell onClick={(e) => {handleClientData(client._id)
+                      editEnablefn()}} align="left">{EditButton()}</StyledTableCell>
+                  </StyledTableRow>
             ))}
             </TableBody>
         </Table>
         </TableContainer>
     </div>
   );
- return {
-   clientInfoForm
-  }
+
 }
 
 export default CIMSTable;

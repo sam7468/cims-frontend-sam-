@@ -90,7 +90,6 @@ function UpdateForm(props){
             var temp = {...errors}
             temp.contacts[`otherContact${i+1}`] = contactSchema
         }
-        console.log("err",temp)
         setErrors(temp)}
         })
       },[])   
@@ -131,7 +130,6 @@ function UpdateForm(props){
                 }}
             )
             .then(res=>{
-                console.log("pincode data -- - - - ",res.data)
                 if(res.data){
                     dispatch(setLoc(res.data))}
                 else if(!res.data && formData.city ===''){
@@ -158,7 +156,6 @@ function UpdateForm(props){
         let new_form = {...formData}
         const data = e.target.value;
         const name = e.target.name;
-        console.log("country ---  ",data)
 
         if (name === 'country'){
             dispatch(setCcode(data.split('-')[1]));
@@ -225,6 +222,7 @@ function UpdateForm(props){
     }
 
     const validateOptional = (type='', fieldValues) => {
+        
         let temp = { ...errors }
         if (fieldValues.title || fieldValues.firstName || fieldValues.lastName ||
             fieldValues.email || fieldValues.contactNumber || fieldValues.otherContactNumber){
@@ -251,8 +249,8 @@ function UpdateForm(props){
             temp['contacts'][type].firstName = ""
             temp['contacts'][type].lastName = ""
             temp['contacts'][type].email = ""
-            temp['contacts'][type].contactNumber = ''
-            temp['contacts'][type].otherContactNumber = ''
+            temp['contacts'][type].contactNumber = ""
+            temp['contacts'][type].otherContactNumber = ""
         }
         setErrors({
             ...temp
@@ -263,8 +261,7 @@ function UpdateForm(props){
 
     const validateBasic = (fieldValues) => {
         let temp = { ...errors }
-        console.log(fieldValues.designation)
-        console.log("designation" in fieldValues)
+
         if ("designation" in fieldValues)
             temp["designation"] = fieldValues.designation ? "" : "This field is required."
         if ("brandname" in fieldValues)
@@ -336,8 +333,8 @@ function UpdateForm(props){
             validateBasic({ [e.target.name]: e.target.value })            
 
         if (validateOptional('tertiaryContact', new_form['contacts']['tertiaryContact'])){
-            if(n===3 ? true : (validateOptional(`otherContact${n-3}`, new_form.contacts[`otherContact${n-3}`]) &&
-                Object.keys(new_form.contacts).length <= n)){
+            if(n===3 ? true : 
+                Object.keys(new_form.contacts).length <= n){
                     setAddOthers(true)
             }
             else{
@@ -348,7 +345,6 @@ function UpdateForm(props){
             setAddOthers(false)
         }
         setformData(new_form);
-        console.log(new_form,"updated--")
     }
 
     const submitForm = async(e) =>{
@@ -438,7 +434,6 @@ function UpdateForm(props){
                             onChange={handelCountry}
                             onBlur={editMode && handelCountry}
                         >
-                            {console.log("-----",Object.keys(loc.loc['districts']),"-----")}
                             {Object.keys(loc.loc['districts']).map((key) => (
                                 <MenuItem
                                     disabled = {!editMode}
@@ -461,6 +456,7 @@ function UpdateForm(props){
                         <InputLabel id="city">{field.label}</InputLabel>
                         <Select labelId="city"
                             name={field.name}
+                            value={formData[field.name]}
                             label={field.label}
                             onChange={handelCountry}
                             onBlur={editMode && handelCountry}
@@ -593,6 +589,7 @@ function UpdateForm(props){
                                             Brand Name
                                         </Typography>
                                         <TextField
+                                            autoFocus={true}
                                             variant="outlined"
                                             InputProps={!editMode && {readOnly: true, disableUnderline: true}}                                            defaultValue={formData.brandname ?? " "}
                                             name="brandname"
@@ -736,17 +733,17 @@ function UpdateForm(props){
                                 <TabList variant='scrollable' onChange={(e, newValue) => setValue(newValue)}>
                                     {tabs}
                                     {n>3? dropDown : <></>}
-                                    <Grid container>
+                                    {editMode && <Grid container>
                                         <Button
                                             id="addOthersBtn" 
                                             sx={{color: 'gray', borderColor: 'white'}} 
                                             variant={!addOthers?"contained":"outlined"}
-                                            onClick={handleAddOthers}
+                                            onClick={ handleAddOthers}
                                             disabled={!addOthers}
                                         >
                                             <AddRoundedIcon sx={{fontSize: "2rem"}} />
                                         </Button>
-                                    </Grid>
+                                    </Grid>}
                                 </TabList>
                             </Box>
                             <TabPanel value={value}>
