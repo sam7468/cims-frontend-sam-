@@ -571,7 +571,7 @@ function UpdateForm(props){
                             InputProps={!editMode && {readOnly: true, disableUnderline: false}}
                             variant="outlined"
                             name="designation"
-                            defaultValue={formData.designation}
+                            defaultValue={formData.designation ?? ""}
                             {...(formData.designation === "" && {key:formData.designation,autoFocus:"autoFocus"})}
                             fullWidth
                             required
@@ -591,9 +591,9 @@ function UpdateForm(props){
                                         <TextField
                                             autoFocus={true}
                                             variant="outlined"
-                                            InputProps={!editMode && {readOnly: true, disableUnderline: true}}                                            defaultValue={formData.brandname ?? " "}
+                                            InputProps={!editMode && {readOnly: true, disableUnderline: true}}
                                             name="brandname"
-                                            defaultValue={formData.brandname}
+                                            defaultValue={formData.brandname ?? ""}
                                             {...(formData.brandname === "" && {key:formData.brandname,autoFocus:"autoFocus"})}
                                             fullWidth
                                             required
@@ -613,7 +613,7 @@ function UpdateForm(props){
                                         autoFocus={true}
                                         variant="outlined"
                                         name="baselocation"
-                                        InputProps={!editMode && {readOnly: true, disableUnderline: true}}                                        defaultValue={formData.baselocation ?? " "}
+                                        InputProps={!editMode && {readOnly: true, disableUnderline: true}}
                                         defaultValue={formData.baselocation}
                                         {...(formData.baselocation === "" && {key:formData.baselocation,autoFocus:"autoFocus"})}
                                         fullWidth
@@ -636,8 +636,8 @@ function UpdateForm(props){
                                         autoFocus={true}
                                         variant="outlined"
                                         name="domain"
-                                        InputProps={!editMode && {readOnly: true, disableUnderline: true}}                                        defaultValue={formData.domain ?? " "}
-                                        defaultValue={formData.domain}
+                                        InputProps={!editMode && {readOnly: true, disableUnderline: true}}                       
+                                        defaultValue={formData.domain ?? ""}
                                         {...(formData.domain === "" && {key:formData.domain,autoFocus:"autoFocus"})}
                                         fullWidth
                                         required
