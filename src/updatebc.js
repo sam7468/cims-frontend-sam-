@@ -17,6 +17,9 @@ import { KeyboardArrowDownRounded as KeyboardArrowDownRoundedIcon,
 } from '@mui/icons-material';
 import UseForm from './Update-UseForm';
 import '../styles/FormStyle.css'
+import { useSelector,useDispatch } from "react-redux";
+import setCcode from "../actions/SetcCode";
+import setLoc from "../actions/SetLoc"
 
 
 function UpdateForm(props){

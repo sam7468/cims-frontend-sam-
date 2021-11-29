@@ -68,10 +68,12 @@ function CIMSTable() {
   },[])
 
   const editEnablefn = () =>{
+    console.log("enable")
     dispatch(editModeEnable())
   }
 
   const editDisablefn = () =>{
+    console.log("enable")
     dispatch(editModeDisable())
   }
 

@@ -1,4 +1,4 @@
-const editModeReducer = (state = false, action) => {
+const editModeReducer = (state = true, action) => {
     switch (action.type){ 
       case "enable": 
         console.log(state,"-- allowed usetr to edit")

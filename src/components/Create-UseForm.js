@@ -4,13 +4,6 @@ import { useSelector,useDispatch } from "react-redux";
 import setCcode from "../actions/SetcCode";
 import setLoc from "../actions/SetLoc"
 
-// + should enabled after tertiary contact 
-
-
-// active client - dropdown
-// update only on onChange
-// phone no validation
-
 const initialFormValues2 = {
     designation:"",
     brandname:"",

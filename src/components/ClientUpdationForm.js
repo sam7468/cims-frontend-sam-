@@ -25,7 +25,7 @@ const useStyles = makeStyles({
 
 })
 
-function UpdateForm(){
+function UpdateForm(props){
 
     const {
         fields,
@@ -45,11 +45,10 @@ function UpdateForm(){
     const classes = useStyles()  
     const dispatch = useDispatch();
     const clientdata = useSelector(state=>state.clientformdata)
-    const editstate = useSelector(state=>state.editmode)
     const initialFormValues = clientdata.data[0]
     const errorValues =  JSON.parse(JSON.stringify(initialFormValues2));
     const [anchorEl, setAnchorEl] = useState(null);
-    const [editMode,seteditMode] = useState(editstate.editmode)
+    const [editMode,seteditMode] = useState(props.editmode)
     const [value, setValue] = useState('primaryContact');
     const [contacts, setContacts] = useState(initialContacts);
     const [formData,setformData] = useState(initialFormValues);
@@ -162,7 +161,8 @@ function UpdateForm(){
         let new_form = {...formData}
         const data = e.target.value;
         const name = e.target.name;
-        console.log("country ---  ",data.split('-')[1])
+        console.log("country ---  ",data)
+
         if (name === 'country'){
             dispatch(setCcode(data.split('-')[1]));
             new_form['city'] = '';
@@ -438,7 +438,7 @@ function UpdateForm(){
                             value={formData[field.name]}
                             label={field.label}
                             onChange={handelCountry}
-                            onBlur={editMode && handelCountry}
+                            // onBlur={editMode && handelCountry}
                         >
                             {console.log("-----",Object.keys(loc.loc['districts']),"-----")}
                             {Object.keys(loc.loc['districts']).map((key) => (
@@ -465,7 +465,7 @@ function UpdateForm(){
                             name={field.name}
                             label={field.label}
                             onChange={handelCountry}
-                            onBlur={editMode && handelCountry}
+                            // onBlur={editMode && handelCountry}
                         >
                             {loc.loc['districts'][formData['district']].map((dist) => (
                                 <MenuItem
@@ -561,7 +561,7 @@ function UpdateForm(){
                     <div className="header-end">
                         <div>
                             <p>Edit mode</p>
-                            <Switch defaultChecked={editstate.editmode}  onClick={()=>{seteditMode(!editMode)}} color="success" />
+                            <Switch defaultChecked={props.editmode}  onClick={()=>{seteditMode(!editMode)}} color="success" />
                         </div>
                     </div>
                 </div>
