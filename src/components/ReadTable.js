@@ -14,7 +14,6 @@ import '../styles/FormStyle.css'
 import { useNavigate } from "react-router";
 import { useDispatch } from 'react-redux'
 import addClientData from "../actions/GetClientData";
-import editMode from "../actions/EditModeEnable"
 import '../styles/tableStyle.css'
 import editModeEnable from "../actions/EditModeEnable";
 import editModeDisable from "../actions/EditModeDisable"
@@ -47,7 +46,6 @@ function CIMSTable() {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const [clientsList,setclientsList] = useState([])
-  const [clientInfoForm,setClientInfoForm] = useState({})
   useEffect(async()=>{
     await axios.post('http://localhost:4000/login')
     .then(data=>data)
@@ -60,8 +58,8 @@ function CIMSTable() {
     await axios.get('http://localhost:4000/cims', {headers: {'authorization': `bearer ${token}`}})
     .then(data=>data)
     .then(list=>{
-      setclientsList(list.data)
-      console.log(list.data)
+      console.log(list,"table response")
+      setclientsList(list.data.data)
     })
   },[])
 
@@ -92,7 +90,7 @@ function CIMSTable() {
                                                                          'id':clientId }})
       .then(clientdata=>clientdata)
       .then(clientInfo => {
-        dispatch(addClientData(clientInfo.data))
+        dispatch(addClientData(clientInfo.data.data))
         console.log(clientInfo.data,"from normal comp")})
         navigate(`/clientdetails/${clientId}`)
   } 
@@ -102,7 +100,7 @@ function CIMSTable() {
 
   return (
 
-    <div className="FormContainer"> {/*//using form container's alignment*/}
+    <div className="FormContainer"> 
         <TableContainer component={Paper} align="right" >
         <Table   sx={{ maxWidth: '100%'}} aria-label="customized table">
             <TableHead>

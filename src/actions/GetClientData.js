@@ -1,10 +1,7 @@
-
-
 const addClientData = (clientinfo) => {
-    return{
-        type:"addData",
-        data:clientinfo
-    }
-}
-export default addClientData
-
+  return {
+    type: "addData",
+    payload: clientinfo,
+  };
+};
+export default addClientData;
